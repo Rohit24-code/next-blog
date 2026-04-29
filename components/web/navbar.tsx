@@ -1,10 +1,19 @@
+"use client"
 import LinkComponent from "@/components/common/LinkComponent";
 import { NAVBARLINKS, SIGNUPLINKS } from "@/constants/navbar";
 import { NavbarTypes } from "@/Types/constantTypes";
 import Link from "next/link";
 import LightDarkMode from "../common/LightDarkMode";
+import { useConvexAuth } from "convex/react";
+import { authClient } from "@/lib/authClient";
+import { buttonVariants } from "../ui/button";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
+  const { isAuthenticated, isLoading } = useConvexAuth()
+  const router = useRouter();
+
   return (
     <div className="w-full py-5 flex items-center justify-between">
       <div className="flex items-center gap-8">
@@ -23,9 +32,32 @@ const Navbar = () => {
       </div>
 
       <div className="flex items-center gap-2">
-        {SIGNUPLINKS?.map((item: NavbarTypes) => {
-          return <LinkComponent item={item} />;
-        })}
+        {isLoading ? null : (
+          <>
+            {isAuthenticated ? (
+              <button
+                className={buttonVariants({ variant: "outline" })}
+                onClick={() => authClient.signOut({
+                  fetchOptions: {
+                    onSuccess: () => {
+                      toast.success("Sign out successfully");
+                      router.push("/");
+                    },
+                    onError: (error) => {
+                      toast.error(error?.error?.message);
+                    }
+                  }
+                })}
+              >
+                Log Out
+              </button>
+            ) : (
+              SIGNUPLINKS.map((item: NavbarTypes) => (
+                <LinkComponent key={item.name} item={item} />
+              ))
+            )}
+          </>
+        )}
 
         <LightDarkMode />
       </div>
