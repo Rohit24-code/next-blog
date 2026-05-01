@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import LinkComponent from "@/components/common/LinkComponent";
 import { NAVBARLINKS, SIGNUPLINKS } from "@/constants/navbar";
 import { NavbarTypes } from "@/Types/constantTypes";
@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 const Navbar = () => {
-  const { isAuthenticated, isLoading } = useConvexAuth()
+  const { isAuthenticated, isLoading } = useConvexAuth();
   const router = useRouter();
 
   return (
@@ -19,14 +19,14 @@ const Navbar = () => {
       <div className="flex items-center gap-8">
         <Link href={"/"}>
           <h1 className="text-3xl font-bold">
-            Next <span className="text-blue-400">Pro</span>
+            Next <span className="text-primary">Pro</span>
           </h1>
         </Link>
 
         {/* links */}
         <div className="flex items-center gap-2">
           {NAVBARLINKS?.map((item: NavbarTypes) => {
-            return <LinkComponent item={item} />;
+            return <LinkComponent key={item?.name} item={item} />;
           })}
         </div>
       </div>
@@ -37,17 +37,19 @@ const Navbar = () => {
             {isAuthenticated ? (
               <button
                 className={buttonVariants({ variant: "outline" })}
-                onClick={() => authClient.signOut({
-                  fetchOptions: {
-                    onSuccess: () => {
-                      toast.success("Sign out successfully");
-                      router.push("/");
+                onClick={() =>
+                  authClient.signOut({
+                    fetchOptions: {
+                      onSuccess: () => {
+                        toast.success("Sign out successfully");
+                        router.push("/");
+                      },
+                      onError: (error) => {
+                        toast.error(error?.error?.message);
+                      },
                     },
-                    onError: (error) => {
-                      toast.error(error?.error?.message);
-                    }
-                  }
-                })}
+                  })
+                }
               >
                 Log Out
               </button>
